@@ -379,26 +379,31 @@ Additionally, Thread B writes contextSwitchCount = 13; after two increments, the
 > 💡 **TIP:** Recall the bounded-buffer solution of the slides (`empty`, `full`, `mutex`) and the order of `wait()` calls in the producer and the consumer. For the deadlock, think about a producer that holds the mutex while waiting for a free slot that only a consumer (who needs the mutex) can create.
 
 **Your Answer:** *(3-5 sentences)*
-
+Because CPU workers remove programs from a shared ready queue, this simulation is comparable to the traditional producer-consumer (bounded-buffer) dilemma. The CPUs operate as consumers when they call poll() and as producers when they re-enqueue incomplete processes using add(), with the main thread serving as the initial producer. I would use empty = K, full = 0, and mutex = 1 for a bounded queue with capacity K, where empty counts open slots, full counts items, and mutex safeguards the queue. Because a consumer would require the same mutex to remove an item and generate a free slot, a deadlock could arise if a producer maintains mutex while waiting for empty. To avoid this, I would obtain the resource-count semaphore prior to
 **Classical problem and roles**:
 [Name the problem; who is the producer, who is the consumer?]
-
+The bounded-buffer producer-consumer conundrum is the issue.
+Producer: Initial processes are created by the main thread; CPU workers also produce when they re-enqueue incomplete processes.
+Consumer: CPU workers execute a quantum by selecting processes from the ready queue.
 **Semaphores for a bounded queue (name and initial value)**:
 [Name the three semaphores and their initial values.]
+empty	K	Counts free queue slots.
+full	0	Counts processes available to consume.
+mutex	1	Provides mutual exclusion for shared queue operations.
 
 **Deadlock scenario and prevention**:
 [Describe the scenario and the necessary condition you would break.]
-
+When the buffer is full, a producer waits on empty after acquiring mutex. Neither thread can advance since the consumer cannot obtain mutex to remove an item. The hold-and-wait condition is broken by acquiring empty or full before mutex, which prevents holding the mutex while waiting. When several mutex locks are employed, a fixed lock order can also avoid circular waits.
 ## Summary
 
 **Key concepts I understood through these questions:**
-1.
-2.
-3.
+1.Both shared counters and shared lineups may be impacted by racial circumstances.
+2.Lock granularity influences contention and complexity, while mutex locks safeguard important areas.
+3.Counting semaphores necessitate cautious shutdown management and permit blocking delays.
 
 **Concepts I need to study more:**
-1.
-2.
+1.Starvation, finite waiting, and fairness in concurrent applications
+2.Safe lock ordering and more intricate deadlock situations
 
 ---
 
