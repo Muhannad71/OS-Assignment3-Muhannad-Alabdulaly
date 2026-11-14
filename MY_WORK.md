@@ -370,7 +370,7 @@ Additionally, Thread B writes contextSwitchCount = 13; after two increments, the
 
 **Your Answer:** *(3-5 sentences)*
 
-[Write your answer here.]
+[Rather than altering the entire program at once, I began by going over the assignment instructions and looking at the original result. I was able to identify the first issue as ReadyQueue.poll() thanks to the frequent selection of P1. Then, in order to comprehend the rationale behind each modification, I worked on the three features in the necessary order. I verified that all update methods and their corresponding getters used the same lock for the statistics. I examined the semaphore actions and carefully determined which portion of the polling loop needed to be updated when Feature 3 proved challenging. In order to prevent modifying RaceWindow, Config, and the verification mechanism, I also compared the new code to the starter. I'll test the solution five times in my own IDE before submitting.]
 
 ## Question 4: Classical Problems and Deadlock
 
