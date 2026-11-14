@@ -179,13 +179,18 @@ class ReadyQueue {
     // ready queue)
     public String snapshot() {
         // TODO Feature 1: protect this critical section
-        StringBuilder sb = new StringBuilder();
-        for (Thread t : list) {
-            if (sb.length() > 0)
-                sb.append(" → ");
-            sb.append(map.get(t).getName());
+        queueLock.lock();
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (Thread t : list) {
+                if (sb.length() > 0)
+                    sb.append(" → ");
+                sb.append(map.get(t).getName());
+            }
+            return sb.length() == 0 ? "empty" : sb.toString();
+        } finally {
+            queueLock.unlock();
         }
-        return sb.length() == 0 ? "empty" : sb.toString();
     }
 }
 
