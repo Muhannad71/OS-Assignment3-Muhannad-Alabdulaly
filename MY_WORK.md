@@ -132,68 +132,81 @@
 
 ## Your Development Log
 
-### Entry 1 - [Date and Time]
+### Entry 1 - [November 14, 2026 5:30pm]
 **What I did**:
-
+evaluated the initial program output, reviewed the synchronization assignment, and verified the starting code.
 **Details**:
-
+11 processes, 2 CPUs, and a time quantum of 3000 ms were the parameters that were constructed using student ID 445050072.
+The original output, which had CPU-1 and CPU-2 selecting P1, was saved.
+found the unsafe ReadyQueue.poll() method and recognized the IllegalThreadStateException that ensued.
 **Challenges**:
-
+The problem was not evident from the final counters alone because the verification values matched despite one CPU thread throwing an exception.
 **Solution**:
-
-**Time spent**:
+To determine the queue race state, hecked the previous output lines and the read/pause/remove sequence in ReadyQueue.poll().
+**Time spent**: around hour
 
 ---
 
-### Entry 2 - [Date and Time]
+### Entry 2 - [November 14, 2026, 7:30 pm]
 **What I did**:
-
+ReentrantLock was used to safeguard the shared ready queue in order to implement Feature 1.
 **Details**:
+I imported ReentrantLock. Declared queueLock inside ReadyQueue.
 
-**Challenges**:
+I protected add() poll() processOf(). Snapshot() using lock() and try/finally.
 
-**Solution**:
+I kept the existing RaceWindow.pause() call unchanged.
+**Challenges**:The queue uses both a LinkedList and a Map. The queue uses both a LinkedList and a Map so protecting poll() does not cover every shared access, to the queue.
 
-**Time spent**:
+
+
+**Solution**:Used the queueLock for every method that reads or changes the list or map
+
+**Time spent**: around 45 minutes
 
 ---
 
-### Entry 3 - [Date and Time]
-**What I did**:
+### Entry 3 - [November 14, 2026, 8:20 pm]
+**What I did**: i Implemented Feature 2 for protect shared statistics.
 
-**Details**:
+**Details**:SharedStats now has contextLock, completedLock, and serviceLock.
+safeguarded the three getter methods and the three update methods.
+Because the counters are independent, a different lock was used for each statistic.
 
-**Challenges**:
+**Challenges**:Both safe reads and safe updates were required for the shared counters, and I had to select the lock granularity.
 
-**Solution**:
+**Solution**:Each updater/getter pair used matching locks, and unlock() was introduced inside finally blocks.
 
-**Time spent**:
-
----
-
-### Entry 4 - [Date and Time]
-**What I did**:
-
-**Details**:
-
-**Challenges**:
-
-**Solution**:
-
-**Time spent**:
+**Time spent**: around hour
 
 ---
 
-### Entry 5 - [Date and Time]
-**What I did**:
+### Entry 4 - [November 14, 2026, 9 pm]
+**What I did**:finished Feature 3 in the most recent Java code and examined the final modifications.
 
-**Details**:
+**Details**:When a process joins the ready queue, readyCount.release() is added.
+ReadyQueue took the place of the previous polling branch.Prior to poll(), wait for Process().
+wakeWaitingCPUs() now has a clean-shutdown call and a completion check.
+retained the student ID and the original verification logic
 
-**Challenges**:
+**Challenges**:Careful tweaking was needed to place the shutdown check correctly and remove the polling logic without deleting the remainder of CpuWorker.run()
 
-**Solution**:
+**Solution**:verified that the CPU can exit once all 11 processes have completed by comparing the modified methods with the initial code.
 
-**Time spent**:
+**Time spent**: around hour
+
+---
+
+### Entry 5 - [November 14, 2026, 10 pm]
+**What I did**: just reviewing 
+
+**Details**: i was making sure everything works fine and there is no problems and now answering the questions
+
+**Challenges**: the questions itself takes time to read and answer and write
+
+**Solution**: taking the time and anwering
+
+**Time spent**: around hour 
 
 ---
 
