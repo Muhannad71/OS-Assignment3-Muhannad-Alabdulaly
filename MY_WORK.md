@@ -357,8 +357,10 @@ Additionally, Thread B writes contextSwitchCount = 13; after two increments, the
 
 | Critical section (variable / method) | Lock used | Why it needs protection |
 |---|---|---|
-| [e.g., `ReadyQueue.poll()`] | [lock name] | [reason] |
-| [...] | [...] | [...] |
+| `ReadyQueue.add()`, `poll()`, `processOf()`, `snapshot()` | `queueLock` | Protects the shared list and map from concurrent access. |
+| `incrementContextSwitch()`, `getContextSwitchCount()` | `contextLock` | Prevents lost updates and protects reads of the counter. |
+| `incrementCompletedProcess()`, `getCompletedProcessCount()` | `completedLock` | Ensures safe updates and reads of completed processes. |
+| `addServiceTime()`, `getTotalServiceTime()` | `serviceLock` | Protects the total CPU service time from concurrent access. |
 
 ## Question 3: Busy Waiting vs Semaphore
 
