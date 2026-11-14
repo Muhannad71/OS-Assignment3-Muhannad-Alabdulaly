@@ -253,7 +253,7 @@ retained the student ID and the original verification logic
 
 **Your Answer:** *(5-7 sentences)*
 
-[Write your answer here.]
+[discovered that when many threads run simultaneously, they can access shared data in an unsafe order. Both CPU-1 and CPU-2 chose P1 in my initial output, which resulted in an IllegalThreadStateException. This clarified for me why ReadyQueue.poll()'s read-and-remove operations need to be protected as a single crucial section. To ensure mutual exclusion and safely release each lock, I utilized ReentrantLock with try/finally. Additionally, I discovered that shared statistics must be protected when being read and updated. Instead of continuously checking an empty queue for Feature 3, I implemented a counting semaphore to allow CPUs to stall when no process is available. I learned from the assignment that concurrent programming is not always secure even if the verification numbers appear correct in a single run.]
 
 ## Question 2: What was the most challenging part of this assignment?
 
@@ -261,7 +261,7 @@ retained the student ID and the original verification logic
 
 **Your Answer:** *(5-7 sentences)*
 
-[Write your answer here.]
+[Feature 3, which substituted a counting semaphore for the busy-waiting loop, was the most difficult aspect for me. I wasn't sure where to put acquire() and release() in the current classes at first. Additionally, I needed to comprehend why the semaphore increases when a process is added to the queue after starting at zero. Because some CPUs could still be blocked even after the last process was finished, the shutdown procedure was particularly confusing. To understand how the permits were used, I had to examine the flow between ReadyQueue.add() and CpuWorker.run(). This section made it clearer to me that synchronization involves managing when threads wait and stop in addition to safeguarding data.]
 
 ## Question 3: How did you overcome the challenges you faced?
 
@@ -269,7 +269,7 @@ retained the student ID and the original verification logic
 
 **Your Answer:** *(5-7 sentences)*
 
-[Write your answer here.]
+[Rather than altering the entire program at once, I began by going over the assignment guidelines and looking at the initial output. I was able to identify ReadyQueue.poll() as the first issue because to the frequent selection of P1. After that, I worked on the three features in the necessary order to comprehend the rationale behind each modification. I verified that each update method and its corresponding getter used the same lock for the statistics. I carefully examined the semaphore actions and determined which portion of the polling loop needed to be updated when Feature 3 proved challenging. In order to prevent modifying RaceWindow, Config, and the verification logic, I also compared the new code with the starter. I will test the solution five times in my own IDE before submitting.]
 
 ## Question 4: Where can synchronization concepts be applied in real-world applications?
 
@@ -277,7 +277,7 @@ retained the student ID and the original verification logic
 
 **Your Answer:** *(5-7 sentences)*
 
-[Write your answer here.]
+[When many threads or users access the same data in real-world applications, synchronization is crucial. A lock can prevent two transactions from overwriting each other's changes in a banking system. Synchronization can stop two clients from booking the same seat in a ticket-booking system. Because separate employees must accept jobs without choosing the same job twice, a shared print queue is comparable to my ready queue. Limiting access to a set amount of resources, such database connections, is another usage for semaphores. These illustrations demonstrate how regulated waiting and mutual exclusion can avoid inaccurate findings and unnecessary processing time.]
 
 ### Optional: What would you like to learn more about?
 
@@ -289,7 +289,7 @@ retained the student ID and the original verification logic
 
 ### Optional: Feedback on the assignment
 
-[Any comments? Was it helpful? Too easy or hard? Suggestions?]
+[if you see this comment PLEASE no more github assignment ]
 
 ---
 
@@ -311,20 +311,39 @@ retained the student ID and the original verification logic
 
 **Your Answer:** *(3-5 sentences)*
 
-[Write your answer here.]
+[Both CPU-1 and CPU-2 chose P1 in my initial beginning run, and CPU-2 returned an IllegalThreadStateException. In that particular run, the verification block reported 22 context switches, 11 finished processes, 51278 ms of service time, and zero busy-waiting polls—all of which matched their expected values—so there was no numerical disparity. Nevertheless, the shared statistics still comprised dangerous read-modify-write sequences, and the duplicate selection demonstrated that ReadyQueue.poll() was not thread-safe. One increment may be missed if two process threads read contextSwitchCount as 12 before either writes 13, as an illustration of a potential lost update. Because threads can be preempted between instructions even in the absence of RaceWindow, this can occur on a real system.pause(), and it is challenging to identify since thread timing ranges between]
 
 Verification block of the **original starter**:
 ```
-[Paste the verification block (or the exception/watchdog message) of the starter here]
+[[CPU-1] picks P1
+[CPU-2] picks P1
+Exception in thread "CPU-2" java.lang.IllegalThreadStateException
+        at java.base/java.lang.Thread.start(Unknown Source)
+        at CpuWorker.run(SchedulerSimulationSync.java:283)
+
+═══ VERIFICATION (expected values are computed from YOUR seed) ═══
+Context switches (quanta executed)     expected 22       observed 22
+Completed processes                    expected 11       observed 11
+Total service time (ms)                expected 51278    observed 51278
+Busy-waiting polls (must be 0)         expected 0        observed 0
+All shared values are consistent.]
 ```
 
 Verification block of **my final version**:
 ```
-[Paste the verification block of your final version here (all lines ✔)]
+[═══ VERIFICATION (expected values are computed from YOUR seed) ═══
+Context switches (quanta executed)     expected 22       observed 22       PASS
+Completed processes                    expected 11       observed 11       PASS
+Total service time (ms)                expected 51278    observed 51278    PASS
+Busy-waiting polls (must be 0)         expected 0        observed 0        PASS
+All shared values are consistent.]
 ```
 
 **Explanation of the timeline:**
-[Explain the lost update step by step.]
+[After reading contextSwitchCount = 12, process thread A calls RaceWindow.pause().
+Prior to A writing its result, process thread B also reads contextSwitchCount = 12.
+ContextSwitchCount = 13 is written by Thread A.
+Additionally, Thread B writes contextSwitchCount = 13; after two increments, the proper total would have been 14. This interleaving is prevented by contextLock, which only permits one thread to update the counter at a time.]
 
 ## Question 2: Critical Sections and Lock Granularity
 
@@ -334,7 +353,7 @@ Verification block of **my final version**:
 
 **Your Answer:** *(3-5 sentences)*
 
-[Write your answer here.]
+[To safeguard the shared list and map in ReadyQueue.add(), poll(), processOf(), and snapshot(), I employed queueLock. For the independent statistics, I employed three different locks: contextLock, completedLock, and serviceLock. Each lock protected the variable's readings and changes. Unrelated statistics can be retrieved simultaneously thanks to its fine-grained design, but it needs more caution and uses more locks than a single statistics lock. Because the queue's data structure is distinct from the counters, its actions do not need to impede other statistics operations; lock() and finally { unlock(); } offer mutual exclusion and facilitate thread advancement by quickly releasing locks. However, a thread may theoretically starve under high congestion because Java's default non-fair ReentrantLock does not ensure finite waiting.]
 
 | Critical section (variable / method) | Lock used | Why it needs protection |
 |---|---|---|
